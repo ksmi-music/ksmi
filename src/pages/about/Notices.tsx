@@ -17,22 +17,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
-const notices = [
-  {
-    id: 1,
-    date: "2026.03.01",
-    title: "한국음악정보학회 홈페이지가 새롭게 단장되었습니다.",
-    tag: "공지",
-    content:
-      "한국음악정보학회(KSMI) 홈페이지가 새롭게 개편되었습니다. 학회 소개, 임원진, 학술대회 정보, 관련 학회·저널·연구실 등 다양한 정보를 보다 편리하게 확인하실 수 있습니다. 앞으로도 많은 관심과 참여 부탁드립니다.",
-  },
-];
+import { useContent } from "@/lib/contentLoader";
 
 const PAGE_SIZE = 10;
 
 const Notices = () => {
   const [page, setPage] = useState(1);
+  const { data: res } = useContent<{ notices: { id: number; date: string; title: string; tag: string; content?: string }[] }>("about/notices.md");
+  const notices = res?.data?.notices ?? [];
   const totalPages = Math.max(1, Math.ceil(notices.length / PAGE_SIZE));
   const paged = notices.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 

@@ -5,27 +5,11 @@ import { ExternalLink, MapPin, Calendar, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-
-const conferences = [
-  {
-    year: 2025,
-    title: "KSMI 2025 창립 심포지엄",
-    link: "/conferences/2025",
-    internal: true,
-    date: "2025년 1월 11일 (토)",
-    location: "KAIST 학술문화관",
-    keynote: "Dr. Masataka Goto (AIST, Japan)",
-    highlights: [
-      "키노트: Music Understanding and Its Application",
-      "연구실/기업 소개 세션 2회",
-      "포스터 세션 2회 (총 60편)",
-      "저녁 만찬 및 네트워킹",
-    ],
-    participants: "17개 연구실·기업 참여",
-  },
-];
+import { useContent } from "@/lib/contentLoader";
 
 const PastConferences = () => {
+  const { data: res } = useContent<{ conferences: { year: number; title: string; link: string; internal: boolean; date?: string; location?: string; keynote?: string; highlights?: string[]; participants?: string }[] }>("conferences/past.md");
+  const conferences = res?.data?.conferences ?? [];
   return (
     <Layout>
       <PageHero title="역대 학술대회" subtitle="Past Conferences" />

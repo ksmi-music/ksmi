@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assetUrl } from "@/lib/assetUrl";
 import { Menu, ChevronDown } from "lucide-react";
@@ -18,7 +18,7 @@ const navItems = [
   {
     label: "학술대회",
     children: [
-      { label: "KSMI 2026", href: "#", disabled: true },
+      { label: "KSMI 2026", href: "/conferences/ksmi2026/cfp", disabled: false },
       { label: "역대 학술대회", href: "/conferences/past" },
     ],
   },
@@ -33,23 +33,40 @@ const navItems = [
 
 const DesktopDropdown = ({ item }: { item: (typeof navItems)[0] }) => {
   const [open, setOpen] = useState(false);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => setOpen(false), 150);
+  };
+
+  useEffect(() => () => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+  }, []);
 
   return (
     <div
       className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
         {item.label}
         <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute left-0 top-full pt-1 z-50">
+        <div className="absolute left-0 top-full pt-0.5 z-50">
           <div className="w-48 rounded-md border border-border bg-popover p-2 shadow-lg animate-dropdown-in origin-top">
             {item.children.map((child) => (
               <div key={child.label}>
-                {child.disabled ? (
+                {child.disabled === true ? (
                   <span className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground/50 cursor-not-allowed">
                     {child.label}
                   </span>
@@ -57,7 +74,7 @@ const DesktopDropdown = ({ item }: { item: (typeof navItems)[0] }) => {
                   <Link
                     to={child.href}
                     onClick={() => setOpen(false)}
-                    className="block rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+                    className="block rounded-md px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"
                   >
                     {child.label}
                   </Link>
@@ -116,7 +133,7 @@ const Header = () => {
                     {item.label}
                   </p>
                   {item.children.map((child) =>
-                    child.disabled ? (
+                    child.disabled === true ? (
                       <span key={child.label} className="block pl-4 py-2 text-sm text-muted-foreground/50">
                         {child.label}
                       </span>
@@ -125,7 +142,7 @@ const Header = () => {
                         key={child.label}
                         to={child.href}
                         onClick={() => setMobileOpen(false)}
-                        className="block pl-4 py-2 text-sm hover:text-primary transition-colors"
+                        className="block pl-4 py-2 text-sm hover:text-primary transition-colors cursor-pointer"
                       >
                         {child.label}
                       </Link>

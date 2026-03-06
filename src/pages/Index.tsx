@@ -1,23 +1,21 @@
+import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Calendar, Bell, Users, BookOpen } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-
-const notices = [
-  { id: 1, date: "2026.03.01", title: "한국음악정보학회 홈페이지가 새롭게 단장되었습니다.", tag: "공지" },
-];
-
-const quickLinks = [
-  { label: "학회 소개", desc: "설립 목적과 비전", href: "/about", icon: BookOpen },
-  { label: "회원 등록", desc: "회원 유형 및 혜택 안내", href: "/about/membership", icon: Users },
-  { label: "역대 학술대회", desc: "연도별 학술대회 기록", href: "/conferences/past", icon: Calendar },
-];
+import { useContent } from "@/lib/contentLoader";
 
 const Index = () => {
   const noticesReveal = useScrollReveal<HTMLElement>();
   const linksReveal = useScrollReveal<HTMLElement>();
+
+  const { data: noticesRes } = useContent<{ notices: { id: number; date: string; title: string; tag: string }[] }>("about/notices.md");
+  const { data: quickLinksRes } = useContent<{ quickLinks: { label: string; desc: string; href: string; icon: string }[] }>("index/quickLinks.md");
+
+  const notices = noticesRes?.data?.notices ?? [];
+  const quickLinks = quickLinksRes?.data?.quickLinks ?? [];
 
   return (
     <Layout>
@@ -54,13 +52,6 @@ const Index = () => {
 
         {/* Gradient line accent */}
         <div className="absolute bottom-0 left-0 w-full h-[2px]" style={{ background: "var(--gradient-accent)" }} />
-
-        {/* Wave divider */}
-        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
-          <svg viewBox="0 0 1200 60" preserveAspectRatio="none" className="w-full h-[40px]">
-            <path d="M0,40 C300,10 600,60 1200,30 L1200,60 L0,60 Z" fill="hsl(0 0% 100%)" />
-          </svg>
-        </div>
       </section>
 
       {/* Notices */}
@@ -70,7 +61,7 @@ const Index = () => {
       >
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary" />
+            <Icons.Bell className="h-5 w-5 text-primary" />
             공지사항
           </h2>
           <Link to="/about/notices" className="text-xs text-muted-foreground hover:text-accent transition-colors">더 보기 →</Link>
@@ -104,22 +95,25 @@ const Index = () => {
         <div className="mx-auto max-w-6xl px-4 py-16">
           <h2 className="text-2xl font-bold text-center mb-10">바로가기</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {quickLinks.map((link, i) => (
+            {quickLinks.map((link, i) => {
+              const IconComponent = (Icons as Record<string, React.ComponentType<{ className?: string }>>)[link.icon] ?? Icons.BookOpen;
+              return (
               <Link key={link.href} to={link.href}>
                 <Card className={`h-full hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group gradient-border-card ${linksReveal.isVisible ? `reveal-visible stagger-${i + 1}` : "reveal-hidden"}`}>
                   <CardContent className="flex flex-col items-center text-center py-10 gap-4">
                     <div className="h-14 w-14 rounded-xl icon-glow flex items-center justify-center">
-                      <link.icon className="h-7 w-7 text-primary group-hover:text-accent transition-colors duration-300" />
+                      <IconComponent className="h-7 w-7 text-primary group-hover:text-accent transition-colors duration-300" />
                     </div>
                     <div>
                       <p className="font-semibold">{link.label}</p>
                       <p className="text-xs text-muted-foreground mt-1">{link.desc}</p>
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                    <Icons.ArrowRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
                   </CardContent>
                 </Card>
               </Link>
-            ))}
+            );
+            })}
           </div>
         </div>
       </section>
