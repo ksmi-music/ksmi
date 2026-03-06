@@ -1,0 +1,23 @@
+---
+labs:
+  - name: "Music and Audio Computing Lab (MACLab)"
+    professor: "남주한 교수"
+    univ: "KAIST 문화기술대학원"
+    url: "https://mac.kaist.ac.kr/"
+  - name: "Music and Audio Research Group (MARG)"
+    professor: "이교구 교수"
+    univ: "서울대학교 융합과학기술대학원"
+    url: "http://marg.snu.ac.kr/"
+  - name: "Music & Art Learning Lab (MALer)"
+    professor: "정다샘 교수"
+    univ: "서강대학교 아트&테크놀로지학과"
+    url: "https://jdasam.github.io/"
+  - name: "Music & Brain Lab (MuBL)"
+    professor: "이경면 교수"
+    univ: "KAIST 문화기술대학원"
+    url: "http://mubl.kaist.ac.kr/"
+  - name: "Applied and Innovative Research for Immersive Sound Lab (AiIRIS Lab)"
+    professor: "김성영 교수"
+    univ: "KAIST 문화기술대학원"
+    url: "https://airislab.kaist.ac.kr/"
+---
