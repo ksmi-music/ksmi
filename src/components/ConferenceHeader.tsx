@@ -9,7 +9,7 @@ const KSMI2026_NAV_STATIC = [
   { label: "Call for Participation", href: "/conferences/ksmi2026/cfp" },
   { label: "Program", href: "/conferences/ksmi2026/program" },
   { label: "Registration", href: "/conferences/ksmi2026/registration" },
-  { label: "메인 사이트", href: "/" },
+  { label: "Main Site", href: "/" },
 ] as const;
 
 const ConferenceHeader = () => {
