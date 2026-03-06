@@ -12,12 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 import { toast } from "sonner";
 import { downloadMd } from "@/lib/downloadMd";
+import { saveContent } from "@/lib/saveContent";
 import { useAdminContent } from "@/hooks/useAdminContent";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
-import { Plus, Trash2, Eye } from "lucide-react";
+import { Plus, Trash2, Eye, Save, Loader2 } from "lucide-react";
 import { SortableItem } from "@/components/admin/SortableItem";
 import { DatePickerInput } from "@/components/admin/DatePickerInput";
 import { useNoticesOverride } from "@/contexts/NoticesOverrideContext";
@@ -40,12 +43,16 @@ interface Notice {
   href?: string;
 }
 
+const CONTENT_PATH = "about/notices.md";
+
 const AdminNotices = () => {
+  const queryClient = useQueryClient();
+  const { setNoticesOverride } = useNoticesOverride() ?? { setNoticesOverride: () => {} };
   const { data, setData, content, isLoading, error, refetch } = useAdminContent<{
     notices: Notice[];
-  }>("about/notices.md");
-  const { setNoticesOverride } = useNoticesOverride() ?? { setNoticesOverride: () => {} };
+  }>(CONTENT_PATH);
   const notices = data?.notices ?? [];
+  const [saving, setSaving] = useState(false);
 
   const addNotice = () => {
     setData((prev) =>
@@ -97,9 +104,18 @@ const AdminNotices = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const handleSave = () => {
-    setNoticesOverride(notices);
-    toast.success("저장되었습니다. 공지사항에 반영됩니다.");
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await saveContent(CONTENT_PATH, { notices }, content);
+    setSaving(false);
+    if (result.ok) {
+      setNoticesOverride(null);
+      toast.success("저장되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["content", CONTENT_PATH] });
+      refetch();
+    } else {
+      toast.error(result.error ?? "저장에 실패했습니다.");
+    }
   };
 
   const handleDownload = () => {
@@ -118,7 +134,8 @@ const AdminNotices = () => {
       loadingComponent={<AdminPageSkeleton />}
       extraActions={
         <>
-          <Button onClick={handleSave}>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             저장
           </Button>
           <Dialog>

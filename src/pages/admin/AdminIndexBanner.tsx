@@ -24,8 +24,7 @@ import { SortableItem } from "@/components/admin/SortableItem";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
+  DialogTitleHidden,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
@@ -131,9 +130,7 @@ const AdminIndexBanner = () => {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl p-0 overflow-hidden">
-            <DialogHeader className="sr-only">
-              <DialogTitle>Root 배너 미리보기</DialogTitle>
-            </DialogHeader>
+            <DialogTitleHidden>Root 배너 미리보기</DialogTitleHidden>
             <div className="max-h-[80vh] overflow-y-auto">
               <section className="relative overflow-hidden py-24 md:py-36">
                 <div

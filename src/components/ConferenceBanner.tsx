@@ -7,12 +7,14 @@ interface BannerButton {
 
 interface ConferenceBannerProps {
   title: string;
+  /** 모바일에서 title 아래 줄바꿈으로 표시 (예: "제1회 학술대회") */
+  titleSub?: string;
   date: string;
   venue: string;
   buttons?: BannerButton[];
 }
 
-const ConferenceBanner = ({ title, date, venue, buttons = [] }: ConferenceBannerProps) => {
+const ConferenceBanner = ({ title, titleSub, date, venue, buttons = [] }: ConferenceBannerProps) => {
   return (
     <section className="relative overflow-hidden">
       {/* Richer background gradient */}
@@ -111,6 +113,13 @@ const ConferenceBanner = ({ title, date, venue, buttons = [] }: ConferenceBanner
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-snug drop-shadow-[0_0_30px_rgba(0,0,0,0.3)]">
             {title}
+            {titleSub && (
+              <>
+                <br className="md:hidden" />
+                <span className="hidden md:inline"> </span>
+                <span className="block md:inline">{titleSub}</span>
+              </>
+            )}
           </h1>
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2 sm:gap-6 text-white/90 text-lg md:text-xl">
             <span className="font-medium">{date}</span>

@@ -11,18 +11,20 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-ki
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { toast } from "sonner";
 import { downloadMd } from "@/lib/downloadMd";
+import { saveContent } from "@/lib/saveContent";
 import { useAdminContent } from "@/hooks/useAdminContent";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
-import { Plus, Trash2, Eye } from "lucide-react";
+import { Plus, Trash2, Eye, Save, Loader2 } from "lucide-react";
 import { SortableItem } from "@/components/admin/SortableItem";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
+  DialogTitleHidden,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ConferenceBanner from "@/components/ConferenceBanner";
@@ -32,11 +34,15 @@ interface BannerButton {
   href: string;
 }
 
+const CONTENT_PATH = "conferences/ksmi2026-banner-buttons.md";
+
 const AdminKsmi2026Banner = () => {
+  const queryClient = useQueryClient();
   const { data, setData, content, isLoading, error, refetch } = useAdminContent<{
     buttons: BannerButton[];
-  }>("conferences/ksmi2026-banner-buttons.md");
+  }>(CONTENT_PATH);
   const buttons = data?.buttons ?? [];
+  const [saving, setSaving] = useState(false);
 
   const addButton = () => {
     setData((prev) =>
@@ -83,8 +89,21 @@ const AdminKsmi2026Banner = () => {
   );
 
   const handleDownload = () => {
-    downloadMd("conferences/ksmi2026-banner-buttons.md", { buttons }, content);
+    downloadMd(CONTENT_PATH, { buttons }, content);
     toast.success("다운로드되었습니다.");
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await saveContent(CONTENT_PATH, { buttons }, content);
+    setSaving(false);
+    if (result.ok) {
+      toast.success("저장되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["content", CONTENT_PATH] });
+      refetch();
+    } else {
+      toast.error(result.error ?? "저장에 실패했습니다.");
+    }
   };
 
   return (
@@ -97,7 +116,12 @@ const AdminKsmi2026Banner = () => {
       onRetry={refetch}
       loadingComponent={<AdminPageSkeleton />}
       extraActions={
-        <Dialog>
+        <>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            저장
+          </Button>
+          <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline">
               <Eye className="h-4 w-4 mr-2" />
@@ -105,19 +129,19 @@ const AdminKsmi2026Banner = () => {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl p-0 overflow-hidden">
-            <DialogHeader className="sr-only">
-              <DialogTitle>배너 미리보기</DialogTitle>
-            </DialogHeader>
+            <DialogTitleHidden>배너 미리보기</DialogTitleHidden>
             <div className="max-h-[80vh] overflow-y-auto">
               <ConferenceBanner
-                title="한국음악정보학회 제1회 학술대회"
+                title="한국음악정보학회"
+                titleSub="제1회 학술대회"
                 date="2026년 5월 30일 (토)"
                 venue="서강대학교, 서울"
                 buttons={buttons}
               />
             </div>
-          </DialogContent>
+            </DialogContent>
         </Dialog>
+        </>
       }
     >
       <p className="text-sm text-muted-foreground mb-6">

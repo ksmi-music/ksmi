@@ -11,12 +11,15 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-ki
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { toast } from "sonner";
 import { downloadMd } from "@/lib/downloadMd";
+import { saveContent } from "@/lib/saveContent";
 import { useAdminContent } from "@/hooks/useAdminContent";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
-import { Plus, Trash2, Eye, ArrowRight } from "lucide-react";
+import { Plus, Trash2, Eye, ArrowRight, Save, Loader2 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { IconPicker } from "@/components/admin/IconPicker";
 import { SortableItem } from "@/components/admin/SortableItem";
@@ -36,11 +39,15 @@ interface QuickLink {
   icon: string;
 }
 
+const CONTENT_PATH = "index/quickLinks.md";
+
 const AdminQuickLinks = () => {
+  const queryClient = useQueryClient();
   const { data, setData, content, isLoading, error, refetch } = useAdminContent<{
     quickLinks: QuickLink[];
-  }>("index/quickLinks.md");
+  }>(CONTENT_PATH);
   const quickLinks = data?.quickLinks ?? [];
+  const [saving, setSaving] = useState(false);
 
   const addLink = () => {
     setData((prev) =>
@@ -91,6 +98,19 @@ const AdminQuickLinks = () => {
     toast.success("다운로드되었습니다.");
   };
 
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await saveContent(CONTENT_PATH, { quickLinks }, content);
+    setSaving(false);
+    if (result.ok) {
+      toast.success("저장되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["content", CONTENT_PATH] });
+      refetch();
+    } else {
+      toast.error(result.error ?? "저장에 실패했습니다.");
+    }
+  };
+
   return (
     <AdminPageShell
       title="바로가기 편집"
@@ -101,7 +121,12 @@ const AdminQuickLinks = () => {
       onRetry={refetch}
       loadingComponent={<AdminPageSkeleton />}
       extraActions={
-        <Dialog>
+        <>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            저장
+          </Button>
+          <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Eye className="h-4 w-4 mr-2" />
@@ -133,6 +158,7 @@ const AdminQuickLinks = () => {
               </div>
             </DialogContent>
         </Dialog>
+        </>
       }
     >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>

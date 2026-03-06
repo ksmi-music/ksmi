@@ -23,7 +23,8 @@ const KSMI2026Banner = () => {
   if (location.pathname === HOME_PATH) {
     return (
       <ConferenceBanner
-        title="한국음악정보학회 제1회 학술대회"
+        title="한국음악정보학회"
+        titleSub="제1회 학술대회"
         date="2026년 5월 30일 (토)"
         venue="서강대학교, 서울"
         buttons={buttons}

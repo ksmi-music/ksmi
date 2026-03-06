@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,10 @@ import { useAdminContent } from "@/hooks/useAdminContent";
 import { useKsmi2026ConfigOverride } from "@/contexts/Ksmi2026ConfigContext";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
+import { Loader2 } from "lucide-react";
 import { downloadMd } from "@/lib/downloadMd";
+import { saveContent } from "@/lib/saveContent";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CONFIG_PATH = "conferences/ksmi2026-config.md";
 
@@ -24,19 +28,30 @@ const HOME_OPTIONS = [
 ] as const;
 
 const AdminKsmi2026Settings = () => {
+  const queryClient = useQueryClient();
   const { data, setData, content, isLoading, error, refetch } = useAdminContent<{
     homeHref: string;
   }>(CONFIG_PATH);
   const { setHomeHrefOverride } = useKsmi2026ConfigOverride() ?? { setHomeHrefOverride: () => {} };
   const homeHref = data?.homeHref ?? "/conferences/ksmi2026";
+  const [saving, setSaving] = useState(false);
 
   const handleHomeHrefChange = (v: string) => {
     setData((prev) => (prev ? { ...prev, homeHref: v } : { homeHref: v }));
   };
 
-  const handleSave = () => {
-    setHomeHrefOverride(homeHref);
-    toast.success("저장되었습니다. KSMI 2026 페이지에서 확인하세요.");
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await saveContent(CONFIG_PATH, { homeHref }, content);
+    setSaving(false);
+    if (result.ok) {
+      setHomeHrefOverride(null);
+      toast.success("저장되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["content", CONFIG_PATH] });
+      refetch();
+    } else {
+      toast.error(result.error ?? "저장에 실패했습니다.");
+    }
   };
 
   const handleDownload = () => {
@@ -75,7 +90,8 @@ const AdminKsmi2026Settings = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={handleSave} className="mt-3">
+          <Button onClick={handleSave} disabled={saving} className="mt-3">
+            {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
             저장
           </Button>
         </div>

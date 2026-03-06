@@ -24,12 +24,15 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useState } from "react";
 import { toast } from "sonner";
 import { downloadMd } from "@/lib/downloadMd";
+import { saveContent } from "@/lib/saveContent";
 import { useAdminContent } from "@/hooks/useAdminContent";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
-import { Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, Save, Loader2 } from "lucide-react";
 import { SortableItem } from "@/components/admin/SortableItem";
 
 interface Conference {
@@ -46,11 +49,15 @@ interface Conference {
 
 type SortOrder = "newest" | "oldest";
 
+const CONTENT_PATH = "conferences/past.md";
+
 const AdminConferences = () => {
+  const queryClient = useQueryClient();
   const { data, setData, content, isLoading, error, refetch } = useAdminContent<{
     conferences: Conference[];
-  }>("conferences/past.md");
+  }>(CONTENT_PATH);
   const allConferences = data?.conferences ?? [];
+  const [saving, setSaving] = useState(false);
 
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
@@ -158,15 +165,34 @@ const AdminConferences = () => {
   );
 
   const handleDownload = () => {
-    downloadMd("conferences/past.md", { conferences }, content);
+    downloadMd(CONTENT_PATH, { conferences: allConferences }, content);
     toast.success("다운로드되었습니다.");
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await saveContent(CONTENT_PATH, { conferences: allConferences }, content);
+    setSaving(false);
+    if (result.ok) {
+      toast.success("저장되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["content", CONTENT_PATH] });
+      refetch();
+    } else {
+      toast.error(result.error ?? "저장에 실패했습니다.");
+    }
   };
 
   return (
     <AdminPageShell
       title="역대 학술대회 편집"
-      filename="conferences/past.md"
+      filename={CONTENT_PATH}
       onDownload={handleDownload}
+      extraActions={
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+          저장
+        </Button>
+      }
       loading={isLoading}
       error={error ?? undefined}
       onRetry={refetch}

@@ -11,12 +11,15 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-ki
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { toast } from "sonner";
 import { downloadMd } from "@/lib/downloadMd";
+import { saveContent } from "@/lib/saveContent";
 import { useAdminContent } from "@/hooks/useAdminContent";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Save, Loader2 } from "lucide-react";
 import { SortableItem } from "@/components/admin/SortableItem";
 
 interface Lab {
@@ -26,11 +29,15 @@ interface Lab {
   url: string;
 }
 
+const CONTENT_PATH = "resources/labs.md";
+
 const AdminLabs = () => {
+  const queryClient = useQueryClient();
   const { data, setData, content, isLoading, error, refetch } = useAdminContent<{
     labs: Lab[];
-  }>("resources/labs.md");
+  }>(CONTENT_PATH);
   const labs = data?.labs ?? [];
+  const [saving, setSaving] = useState(false);
 
   const addLab = () => {
     setData((prev) =>
@@ -73,15 +80,34 @@ const AdminLabs = () => {
   );
 
   const handleDownload = () => {
-    downloadMd("resources/labs.md", { labs }, content);
+    downloadMd(CONTENT_PATH, { labs }, content);
     toast.success("다운로드되었습니다.");
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await saveContent(CONTENT_PATH, { labs }, content);
+    setSaving(false);
+    if (result.ok) {
+      toast.success("저장되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["content", CONTENT_PATH] });
+      refetch();
+    } else {
+      toast.error(result.error ?? "저장에 실패했습니다.");
+    }
   };
 
   return (
     <AdminPageShell
       title="연구실 편집"
-      filename="resources/labs.md"
+      filename={CONTENT_PATH}
       onDownload={handleDownload}
+      extraActions={
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+          저장
+        </Button>
+      }
       loading={isLoading}
       error={error ?? undefined}
       onRetry={refetch}

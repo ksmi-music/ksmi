@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Root as VisuallyHiddenRoot } from "@radix-ui/react-visually-hidden";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -81,6 +82,13 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
+/** DialogTitle를 시각적으로 숨기되 스크린 리더에는 노출 (접근성) */
+const DialogTitleHidden = ({ children, ...props }: React.ComponentProps<typeof DialogTitle>) => (
+  <VisuallyHiddenRoot asChild>
+    <DialogTitle {...props}>{children}</DialogTitle>
+  </VisuallyHiddenRoot>
+);
+
 export {
   Dialog,
   DialogPortal,
@@ -91,5 +99,6 @@ export {
   DialogHeader,
   DialogFooter,
   DialogTitle,
+  DialogTitleHidden,
   DialogDescription,
 };

@@ -12,13 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
 import { toast } from "sonner";
 import { downloadMd } from "@/lib/downloadMd";
+import { saveContent } from "@/lib/saveContent";
 import { useAdminContent } from "@/hooks/useAdminContent";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
 import type { SocietiesData, SocietyItem } from "@/lib/content";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Save, Loader2 } from "lucide-react";
 import { SortableItem } from "@/components/admin/SortableItem";
 
 type SectionKey = keyof SocietiesData;
@@ -39,10 +42,14 @@ const DEFAULT_SECTIONS: SocietiesData = {
   resources: [],
 };
 
+const CONTENT_PATH = "resources/societies.md";
+
 const AdminSocieties = () => {
+  const queryClient = useQueryClient();
   const { data, setData, content, isLoading, error, refetch } =
-    useAdminContent<SocietiesData>("resources/societies.md");
+    useAdminContent<SocietiesData>(CONTENT_PATH);
   const sections = data ?? DEFAULT_SECTIONS;
+  const [saving, setSaving] = useState(false);
 
   const updateItem = (section: SectionKey, index: number, field: keyof SocietyItem, value: string) => {
     setData((prev) => {
@@ -102,8 +109,21 @@ const AdminSocieties = () => {
   );
 
   const handleDownload = () => {
-    downloadMd("resources/societies.md", sections, content);
+    downloadMd(CONTENT_PATH, sections, content);
     toast.success("다운로드되었습니다.");
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await saveContent(CONTENT_PATH, sections, content);
+    setSaving(false);
+    if (result.ok) {
+      toast.success("저장되었습니다.");
+      await queryClient.invalidateQueries({ queryKey: ["content", CONTENT_PATH] });
+      refetch();
+    } else {
+      toast.error(result.error ?? "저장에 실패했습니다.");
+    }
   };
 
   const SocietyItemForm = ({
@@ -188,8 +208,14 @@ const AdminSocieties = () => {
   return (
     <AdminPageShell
       title="관련 학회/저널 편집"
-      filename="resources/societies.md"
+      filename={CONTENT_PATH}
       onDownload={handleDownload}
+      extraActions={
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+          저장
+        </Button>
+      }
       loading={isLoading}
       error={error ?? undefined}
       onRetry={refetch}
