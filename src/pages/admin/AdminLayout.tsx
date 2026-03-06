@@ -31,6 +31,7 @@ const AdminLayout = () => {
   };
 
   const generalItems = ADMIN_SECTIONS.filter((s) => s.category === "general");
+  const rootItems = ADMIN_SECTIONS.filter((s) => s.category === "root");
   const societyItems = ADMIN_SECTIONS.filter((s) => s.category === "society");
   const conferenceListItems = ADMIN_SECTIONS.filter(
     (s) => s.category === "conference" && s.conferenceType === "list"
@@ -87,6 +88,25 @@ const AdminLayout = () => {
           </p>
           <div className="space-y-0.5">
             {generalItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                icon={item.icon}
+                label={item.label}
+                active={isActive(item.to)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      {/* Root 페이지 */}
+      {rootItems.length > 0 && (
+        <div>
+          <p className="mb-1 px-3 text-xs font-medium text-muted-foreground">
+            {ADMIN_CATEGORIES.root}
+          </p>
+          <div className="space-y-0.5">
+            {rootItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}

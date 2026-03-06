@@ -19,6 +19,8 @@ import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { AdminPageSkeleton } from "@/components/admin/AdminPageSkeleton";
 import { Plus, Trash2, Eye } from "lucide-react";
 import { SortableItem } from "@/components/admin/SortableItem";
+import { DatePickerInput } from "@/components/admin/DatePickerInput";
+import { useNoticesOverride } from "@/contexts/NoticesOverrideContext";
 import {
   Dialog,
   DialogContent,
@@ -35,12 +37,14 @@ interface Notice {
   title: string;
   tag: string;
   content?: string;
+  href?: string;
 }
 
 const AdminNotices = () => {
   const { data, setData, content, isLoading, error, refetch } = useAdminContent<{
     notices: Notice[];
   }>("about/notices.md");
+  const { setNoticesOverride } = useNoticesOverride() ?? { setNoticesOverride: () => {} };
   const notices = data?.notices ?? [];
 
   const addNotice = () => {
@@ -50,7 +54,7 @@ const AdminNotices = () => {
             ...prev,
             notices: [
               ...prev.notices,
-              { id: Date.now(), date: "", title: "", tag: "공지", content: "" },
+              { id: Date.now(), date: "", title: "", tag: "공지", content: "", href: "" },
             ],
           }
         : { notices: [{ id: Date.now(), date: "", title: "", tag: "공지", content: "" }] }
@@ -93,6 +97,11 @@ const AdminNotices = () => {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  const handleSave = () => {
+    setNoticesOverride(notices);
+    toast.success("저장되었습니다. 공지사항에 반영됩니다.");
+  };
+
   const handleDownload = () => {
     downloadMd("about/notices.md", { notices }, content);
     toast.success("다운로드되었습니다.");
@@ -108,7 +117,11 @@ const AdminNotices = () => {
       onRetry={refetch}
       loadingComponent={<AdminPageSkeleton />}
       extraActions={
-        <Dialog>
+        <>
+          <Button onClick={handleSave}>
+            저장
+          </Button>
+          <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline">
               <Eye className="h-4 w-4 mr-2" />
@@ -127,6 +140,9 @@ const AdminNotices = () => {
                       {n.tag}
                     </Badge>
                     <p className="flex-1 text-sm">{n.title}</p>
+                    {n.href?.trim() && (
+                      <span className="text-xs text-muted-foreground shrink-0">링크</span>
+                    )}
                     <span className="text-xs text-muted-foreground shrink-0">{n.date}</span>
                   </CardContent>
                 </Card>
@@ -134,6 +150,7 @@ const AdminNotices = () => {
             </div>
           </DialogContent>
         </Dialog>
+        </>
       }
     >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -151,9 +168,9 @@ const AdminNotices = () => {
                   <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>날짜</Label>
-                <Input
+                <DatePickerInput
                   value={notice.date}
-                  onChange={(e) => updateNotice(index, "date", e.target.value)}
+                  onChange={(v) => updateNotice(index, "date", v)}
                   placeholder="2026.03.01"
                 />
               </div>
@@ -172,6 +189,14 @@ const AdminNotices = () => {
                 value={notice.title}
                 onChange={(e) => updateNotice(index, "title", e.target.value)}
                 placeholder="공지 제목"
+              />
+            </div>
+            <div>
+              <Label>링크 (선택)</Label>
+              <Input
+                value={notice.href ?? ""}
+                onChange={(e) => updateNotice(index, "href", e.target.value)}
+                placeholder="/about/notices 또는 https://..."
               />
             </div>
             <div>

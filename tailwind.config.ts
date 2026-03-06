@@ -92,6 +92,10 @@ export default {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        shimmer: {
+          "0%, 100%": { backgroundPosition: "200% 0" },
+          "50%": { backgroundPosition: "-200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -101,6 +105,7 @@ export default {
         "float": "float 6s ease-in-out infinite",
         "dropdown-in": "dropdown-in 0.15s ease-out forwards",
         "page-fade": "page-fade 0.3s ease-out forwards",
+        shimmer: "shimmer 8s ease-in-out infinite",
       },
     },
   },

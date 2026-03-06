@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
-import { Home, Bell, Link2, Building2, FlaskConical, Calendar, FileText, BookOpen } from "lucide-react";
+import { Home, Bell, Link2, Building2, FlaskConical, Calendar, FileText, BookOpen, LayoutPanelTop } from "lucide-react";
 
-export type AdminCategory = "general" | "society" | "conference";
+export type AdminCategory = "general" | "root" | "society" | "conference";
 
 export type ConferenceSubType = "list" | "year";
 
@@ -22,6 +22,7 @@ export interface AdminSection {
 
 export const ADMIN_CATEGORIES: Record<AdminCategory, string> = {
   general: "일반",
+  root: "Root 페이지",
   society: "학회/리소스",
   conference: "학술대회",
 };
@@ -40,15 +41,23 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     label: "공지사항",
     path: "public/content/about/notices.md",
     desc: "홈 및 공지사항 페이지",
-    category: "general",
+    category: "root",
     icon: Bell,
+  },
+  {
+    to: "/admin/index-banner",
+    label: "Root 배너 버튼",
+    path: "public/content/index/banner-buttons.md",
+    desc: "홈(/) 배너에 표시할 버튼",
+    category: "root",
+    icon: LayoutPanelTop,
   },
   {
     to: "/admin/quick-links",
     label: "바로가기",
     path: "public/content/index/quickLinks.md",
     desc: "홈 바로가기 링크",
-    category: "general",
+    category: "root",
     icon: Link2,
   },
   {
@@ -100,6 +109,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
       { to: "/admin/conferences/ksmi2026", label: "CFP" },
       { to: "/admin/conferences/ksmi2026/program", label: "Program" },
       { to: "/admin/conferences/ksmi2026/registration", label: "Registration" },
+      { to: "/admin/conferences/ksmi2026/banner", label: "배너 버튼" },
       { to: "/admin/conferences/ksmi2026/settings", label: "설정" },
     ],
   },

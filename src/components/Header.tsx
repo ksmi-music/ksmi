@@ -18,7 +18,7 @@ const navItems = [
   {
     label: "학술대회",
     children: [
-      { label: "KSMI 2026", href: "/conferences/ksmi2026/cfp", disabled: false },
+      { label: "KSMI 2026", href: "/conferences/ksmi2026", disabled: false },
       { label: "역대 학술대회", href: "/conferences/past" },
     ],
   },

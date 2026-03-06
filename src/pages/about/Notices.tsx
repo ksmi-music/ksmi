@@ -17,14 +17,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useContent } from "@/lib/contentLoader";
+import { Link } from "react-router-dom";
+import { useNoticesContent } from "@/hooks/useNoticesContent";
+import { ExternalLink } from "lucide-react";
 
 const PAGE_SIZE = 10;
 
 const Notices = () => {
   const [page, setPage] = useState(1);
-  const { data: res } = useContent<{ notices: { id: number; date: string; title: string; tag: string; content?: string }[] }>("about/notices.md");
-  const notices = res?.data?.notices ?? [];
+  const { notices } = useNoticesContent();
   const totalPages = Math.max(1, Math.ceil(notices.length / PAGE_SIZE));
   const paged = notices.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -32,7 +33,7 @@ const Notices = () => {
     <Layout>
       <PageHero title="공지사항" subtitle="Notices" />
 
-      <ScrollReveal className="mx-auto max-w-4xl px-4 py-16">
+      <ScrollReveal className="mx-auto max-w-6xl px-4 py-16">
         <Accordion type="single" collapsible className="space-y-3">
           {paged.map((n) => (
             <AccordionItem
@@ -49,6 +50,31 @@ const Notices = () => {
                     {n.tag}
                   </Badge>
                   <span className="flex-1 text-sm text-left truncate">{n.title}</span>
+                  {n.href?.trim() ? (
+                    <span
+                      className="shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {n.href.startsWith("/") ? (
+                        <Link
+                          to={n.href}
+                          className="text-xs text-muted-foreground hover:text-accent transition-colors"
+                        >
+                          링크
+                        </Link>
+                      ) : (
+                        <a
+                          href={n.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-muted-foreground hover:text-accent transition-colors inline-flex items-center gap-1"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          링크
+                        </a>
+                      )}
+                    </span>
+                  ) : null}
                   <span className="text-xs text-muted-foreground shrink-0 hidden sm:block">
                     {n.date}
                   </span>

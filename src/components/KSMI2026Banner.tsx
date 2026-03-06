@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import ConferenceBanner from "./ConferenceBanner";
 import PageHero from "./PageHero";
+import { useContent } from "@/lib/contentLoader";
 
 /** 홈 = /conferences/ksmi2026 (로고 클릭 시 진입 경로) → ConferenceBanner */
 const HOME_PATH = "/conferences/ksmi2026";
@@ -14,6 +15,10 @@ const KSMI2026_PAGE_BANNERS: Record<string, { title: string; subtitle: string }>
 
 const KSMI2026Banner = () => {
   const location = useLocation();
+  const { data: bannerButtonsRes } = useContent<{ buttons: { label: string; href: string }[] }>(
+    "conferences/ksmi2026-banner-buttons.md"
+  );
+  const buttons = bannerButtonsRes?.data?.buttons ?? [];
 
   if (location.pathname === HOME_PATH) {
     return (
@@ -21,6 +26,7 @@ const KSMI2026Banner = () => {
         title="한국음악정보학회 제1회 학술대회"
         date="2026년 5월 30일 (토)"
         venue="서강대학교, 서울"
+        buttons={buttons}
       />
     );
   }
