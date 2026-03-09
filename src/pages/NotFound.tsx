@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { SeoHead } from "@/components/SeoHead";
 
 const NotFound = () => {
   const location = useLocation();
@@ -9,6 +10,13 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
+    <>
+      <SeoHead
+        title="페이지를 찾을 수 없습니다"
+        description="요청하신 페이지를 찾을 수 없습니다."
+        path={location.pathname}
+        noIndex
+      />
     <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="text-center">
         <h1 className="mb-4 text-4xl font-bold">404</h1>
@@ -18,6 +26,7 @@ const NotFound = () => {
         </a>
       </div>
     </div>
+    </>
   );
 };
 

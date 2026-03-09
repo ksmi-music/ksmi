@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -41,6 +42,7 @@ import Labs from "./pages/resources/Labs";
 const queryClient = new QueryClient();
 
 const App = () => (
+  <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <Ksmi2026ConfigProvider>
     <NoticesOverrideProvider>
@@ -88,6 +90,7 @@ const App = () => (
     </NoticesOverrideProvider>
     </Ksmi2026ConfigProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
