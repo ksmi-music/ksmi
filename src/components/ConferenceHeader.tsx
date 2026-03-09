@@ -6,10 +6,10 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 /** homeHref 설정과 무관하게 CFP 포함 모든 메뉴 링크는 항상 표시 */
 const KSMI2026_NAV_STATIC = [
-  { label: "Call for Participation", href: "/conferences/ksmi2026/cfp" },
-  { label: "Program", href: "/conferences/ksmi2026/program" },
-  { label: "Registration", href: "/conferences/ksmi2026/registration" },
-  { label: "Main Site", href: "/" },
+  { label: "논문 및 데모 발표 모집", href: "/conferences/ksmi2026/cfp" },
+  { label: "프로그램", href: "/conferences/ksmi2026/program" },
+  { label: "등록", href: "/conferences/ksmi2026/registration" },
+  { label: "학회 홈페이지", href: "/" },
 ] as const;
 
 const ConferenceHeader = () => {

@@ -14,7 +14,7 @@ import { useContent } from "@/lib/contentLoader";
 
 const Labs = () => {
   const { data: res } = useContent<{ labs: { name: string; professor: string; univ: string; url: string }[] }>("resources/labs.md");
-  const labs = res?.data?.labs ?? [];
+  const labs = (res?.data?.labs ?? []).slice().sort((a, b) => a.name.localeCompare(b.name));
 
   const NameLink = ({ name, url }: { name: string; url: string }) => (
   <a

@@ -21,10 +21,10 @@ import { useQueryClient } from "@tanstack/react-query";
 const CONFIG_PATH = "conferences/ksmi2026-config.md";
 
 const HOME_OPTIONS = [
-  { value: "/conferences/ksmi2026", label: "CFP (Call for Participation)" },
-  { value: "/conferences/ksmi2026/program", label: "Program" },
-  { value: "/conferences/ksmi2026/registration", label: "Registration" },
-  { value: "/", label: "메인 사이트" },
+  { value: "/conferences/ksmi2026", label: "논문 및 데모 발표 모집" },
+  { value: "/conferences/ksmi2026/program", label: "프로그램" },
+  { value: "/conferences/ksmi2026/registration", label: "등록" },
+  { value: "/", label: "학회 홈페이지" },
 ] as const;
 
 const AdminKsmi2026Settings = () => {
@@ -73,7 +73,7 @@ const AdminKsmi2026Settings = () => {
         <div>
           <Label>홈 페이지 본문 내용</Label>
           <p className="text-sm text-muted-foreground mt-1 mb-3">
-            /conferences/ksmi2026 홈은 항상 ConferenceBanner를 사용합니다. 아래에서 홈에 표시할 본문 내용(CFP, Program, Registration)을 선택하세요.
+            /conferences/ksmi2026 홈은 항상 ConferenceBanner를 사용합니다. 아래에서 홈에 표시할 본문 내용을 선택하세요.
           </p>
           <Select
             value={homeHref}

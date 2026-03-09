@@ -36,14 +36,14 @@ const KSMI2026Landing = () => {
         </ScrollReveal>
       ) : homeHref === "/conferences/ksmi2026/program" ? (
         <ComingSoon
-          title="Program"
+          title="프로그램"
           subtitle="KSMI 2026"
           description="프로그램 일정을 준비하고 있습니다. 곧 오픈될 예정입니다."
           hideHero
         />
       ) : homeHref === "/conferences/ksmi2026/registration" ? (
         <ComingSoon
-          title="Registration"
+          title="등록"
           subtitle="KSMI 2026"
           description="등록 안내를 준비하고 있습니다. 곧 오픈될 예정입니다."
           hideHero

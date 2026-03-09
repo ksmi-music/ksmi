@@ -6,7 +6,7 @@ const KSMI2026Registration = () => (
   <Layout>
     <KSMI2026Banner />
     <ComingSoon
-      title="Registration"
+      title="등록"
       subtitle="KSMI 2026"
       description="등록 안내를 준비하고 있습니다. 곧 오픈될 예정입니다."
       hideHero

@@ -8,9 +8,9 @@ const HOME_PATH = "/conferences/ksmi2026";
 
 /** CFP, Program, Registration → PageHero */
 const KSMI2026_PAGE_BANNERS: Record<string, { title: string; subtitle: string }> = {
-  "/conferences/ksmi2026/cfp": { title: "Call for Participation", subtitle: "KSMI 2026" },
-  "/conferences/ksmi2026/program": { title: "Program", subtitle: "KSMI 2026" },
-  "/conferences/ksmi2026/registration": { title: "Registration", subtitle: "KSMI 2026" },
+  "/conferences/ksmi2026/cfp": { title: "논문 및 데모 발표 모집", subtitle: "KSMI 2026" },
+  "/conferences/ksmi2026/program": { title: "프로그램", subtitle: "KSMI 2026" },
+  "/conferences/ksmi2026/registration": { title: "등록", subtitle: "KSMI 2026" },
 };
 
 const KSMI2026Banner = () => {
